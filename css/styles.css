@@ -3,10 +3,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f5f5f5;
     background-image: url('../assets/images/bg-pattern.png');
     color: #333;
@@ -39,6 +39,7 @@ body {
 
 .logo-container {
     margin-bottom: 24px;
+    text-align: center;
 }
 
 .logo {
@@ -51,6 +52,7 @@ h1 {
     color: #333;
     margin-bottom: 8px;
     font-weight: 600;
+    text-align: center;
 }
 
 .subtitle {
@@ -106,7 +108,7 @@ input[type="password"].success {
     box-shadow: 0 0 0 3px rgba(74, 255, 127, 0.15);
 }
 
-.validation-message {
+.validation-message, .error-message {
     font-size: 12px;
     margin-top: 5px;
     color: #ff4a4a;
@@ -147,7 +149,7 @@ input[type="checkbox"] {
 }
 
 /* Submit button */
-.submit-button {
+.submit-button, .login-button {
     width: 100%;
     padding: 14px;
     background-color: #4a80ff;
@@ -160,38 +162,39 @@ input[type="checkbox"] {
     transition: all 0.3s;
 }
 
-.submit-button:hover {
+.submit-button:hover, .login-button:hover {
     background-color: #3a70f0;
 }
 
-.submit-button:active {
+.submit-button:active, .login-button:active {
     transform: scale(0.98);
 }
 
-.submit-button:disabled {
+.submit-button:disabled, .login-button:disabled {
     background-color: #b3c2e6;
     cursor: not-allowed;
 }
 
 /* Signup link */
-.signup-link {
+.signup-link, .register-link {
     margin-top: 24px;
     font-size: 14px;
     color: #666;
+    text-align: center;
 }
 
-.signup-link a {
+.signup-link a, .register-link a {
     color: #4a80ff;
     text-decoration: none;
     font-weight: 500;
 }
 
-.signup-link a:hover {
+.signup-link a:hover, .register-link a:hover {
     text-decoration: underline;
 }
 
 /* Feedback container */
-.feedback-container {
+.feedback-container, .login-feedback {
     padding: 12px;
     margin-bottom: 20px;
     border-radius: 6px;
@@ -200,16 +203,17 @@ input[type="checkbox"] {
     font-weight: 500;
     align-items: center;
     justify-content: center;
+    text-align: center;
 }
 
-.feedback-container.success {
+.feedback-container.success, .login-feedback.success {
     background-color: #e6f7ee;
     color: #2fcc71;
     border: 1px solid #d1f2e0;
     display: flex;
 }
 
-.feedback-container.error {
+.feedback-container.error, .login-feedback.error {
     background-color: #fdeded;
     color: #ff4a4a;
     border: 1px solid #f9d7d7;
@@ -222,10 +226,58 @@ input[type="checkbox"] {
     margin-right: 8px;
 }
 
+/* Password Strength Indicator */
+.password-strength {
+    margin-top: 5px;
+    display: none;
+}
+
+.password-strength.active {
+    display: block;
+}
+
+.strength-bar {
+    height: 5px;
+    background-color: #e0e0e0;
+    margin-bottom: 3px;
+    border-radius: 2px;
+    position: relative;
+}
+
+.strength-bar::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 0;
+    border-radius: 2px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-bar.weak::before {
+    width: 33%;
+    background-color: #dc3545;
+}
+
+.strength-bar.medium::before {
+    width: 66%;
+    background-color: #ffc107;
+}
+
+.strength-bar.strong::before {
+    width: 100%;
+    background-color: #28a745;
+}
+
+.strength-text {
+    font-size: 0.75rem;
+    color: #666;
+}
+
 /* Responsive styles */
 @media (max-width: 576px) {
     .login-container {
         padding: 30px 20px;
+        margin: 0 1rem;
     }
 
     .form-options {
@@ -238,7 +290,7 @@ input[type="checkbox"] {
         font-size: 24px;
     }
 
-    .submit-button {
+    .submit-button, .login-button {
         padding: 12px;
     }
 }

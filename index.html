@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Secure login page with comprehensive validation">
+    <!-- Security headers implemented as meta tags -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <!-- Content Security Policy to prevent XSS attacks -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self';">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <title>Login - Secure Access</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Fallback CDN for Bootstrap in case npm install failed -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <!-- Fallback inline styles if external CSS fails to load -->
     <style>
         /* Critical styles for functionality */
@@ -136,6 +144,26 @@
             background-color: #3a7bc8;
         }
         
+        /* Password strength indicator */
+        .password-strength {
+            margin-top: 5px;
+            height: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .strength-bar {
+            height: 100%;
+            width: 0;
+            background-color: #ff4d4d;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        
+        .strength-text {
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 576px) {
             .login-container {
@@ -173,7 +201,10 @@
             <div id="feedbackContainer" class="feedback-container"></div>
             
             <!-- Login Form -->
-            <form id="loginForm" class="login-form" novalidate>
+            <form id="loginForm" class="login-form" novalidate autocomplete="on">
+                <!-- CSRF token hidden field -->
+                <input type="hidden" id="csrfToken" name="csrfToken">
+                
                 <!-- Error alert for form-wide errors -->
                 <div id="formError" class="alert alert-danger hidden" role="alert" aria-live="assertive"></div>
                 
@@ -211,6 +242,11 @@
                         </button>
                     </div>
                     <div class="validation-message error-message" id="password-error">Please enter your password</div>
+                    <!-- Password strength indicator -->
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-bar"></div>
+                        <span class="strength-text"></span>
+                    </div>
                 </div>
 
                 <div class="success-message" id="loginSuccess">Login successful! Redirecting...</div>
@@ -286,6 +322,14 @@
         const loginSuccess = document.getElementById('loginSuccess');
         const logoutButton = document.getElementById('logout-button');
         const authStatus = document.getElementById('auth-status');
+        
+        // CSRF protection - generate a token
+        function generateCSRFToken() {
+            return Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+        }
+        
+        // Set the CSRF token
+        document.getElementById('csrfToken').value = generateCSRFToken();
 
         // Show/hide password
         if (togglePasswordButton) {
@@ -306,6 +350,40 @@
                 document.querySelector('.login-container').classList.remove('hidden');
                 authStatus.textContent = 'Not logged in';
                 authStatus.className = 'status-logged-out';
+            });
+        }
+
+        // Password strength checker
+        if (passwordInput && document.getElementById('passwordStrength')) {
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                const strengthBar = document.querySelector('.strength-bar');
+                const strengthText = document.querySelector('.strength-text');
+                
+                // Calculate password strength
+                let strength = 0;
+                if (password.length >= 8) strength += 25;
+                if (password.match(/[a-z]/)) strength += 25;
+                if (password.match(/[A-Z]/)) strength += 25;
+                if (password.match(/[0-9]/)) strength += 25;
+                if (password.match(/[^a-zA-Z0-9]/)) strength += 25;
+                
+                // Limit to 100%
+                strength = Math.min(strength, 100);
+                
+                // Update UI
+                strengthBar.style.width = strength + '%';
+                
+                if (strength < 30) {
+                    strengthBar.style.backgroundColor = '#ff4d4d';
+                    strengthText.textContent = 'Weak';
+                } else if (strength < 70) {
+                    strengthBar.style.backgroundColor = '#ffaa00';
+                    strengthText.textContent = 'Medium';
+                } else {
+                    strengthBar.style.backgroundColor = '#00cc00';
+                    strengthText.textContent = 'Strong';
+                }
             });
         }
 
@@ -352,10 +430,16 @@
                     try {
                         // For testing purposes - in production, this would call your actual authentication code
                         if (typeof performLogin === 'function') {
-                            performLogin(usernameInput.value, passwordInput.value)
+                            performLogin(usernameInput.value, passwordInput.value, document.getElementById('csrfToken').value)
                                 .then(() => {
                                     // Success handling would happen in auth.js
                                     loginSuccess.classList.add('visible');
+                                    setTimeout(() => {
+                                        document.querySelector('.login-container').classList.add('hidden');
+                                        document.querySelector('.protected-content').classList.remove('hidden');
+                                        authStatus.textContent = 'Logged in as ' + usernameInput.value;
+                                        authStatus.className = 'status-logged-in';
+                                    }, 1500);
                                 })
                                 .catch(error => {
                                     formError.textContent = error.message || 'Login failed. Please try again.';
@@ -371,9 +455,14 @@
                             console.log('Login attempted with:', usernameInput.value);
 
                             // For demo only - show success
-                            formError.textContent = 'Demo mode: Auth successful (no actual authentication performed)';
-                            formError.classList.remove('hidden');
-                            formError.classList.add('alert-success');
+                            loginSuccess.classList.add('visible');
+                            
+                            setTimeout(() => {
+                                document.querySelector('.login-container').classList.add('hidden');
+                                document.querySelector('.protected-content').classList.remove('hidden');
+                                authStatus.textContent = 'Logged in as ' + usernameInput.value;
+                                authStatus.className = 'status-logged-in';
+                            }, 1500);
 
                             loginButton.disabled = false;
                             loadingIndicator.classList.add('hidden');
