@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure login page with comprehensive validation">
-    <title>Secure Login System</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Secure login page for Boutique shop">
+    <title>Boutique | Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Fallback inline styles if external CSS fails to load -->
     <style>
@@ -80,95 +81,94 @@
     </style>
 </head>
 <body>
-    <main class="login-container">
-        <img src="https://via.placeholder.com/120x60?text=Logo" alt="Boutique Logo" class="logo">
-        <h1>Log In</h1>
-
-        <!-- Login Form -->
-        <form id="loginForm" novalidate>
-            <!-- Error alert for form-wide errors -->
-            <div id="formError" class="alert alert-danger hidden" role="alert" aria-live="assertive"></div>
-            <!-- Feedback Messages Container -->
-            <div id="login-feedback" class="feedback-container"></div>
-
-            <!-- Username/Email field -->
-            <div class="form-group">
-                <label for="username">Username or Email</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    autocomplete="username"
-                    required
-                    aria-required="true"
-                    data-validation="required"
-                >
-                <div class="error-message" id="username-error">Please enter your username or email</div>
+    <div class="container">
+        <div class="login-container">
+            <div class="logo-container">
+                <img src="assets/images/logo.png" alt="Boutique Logo" class="logo">
             </div>
 
-            <!-- Password field -->
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-container">
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Please login to your account</p>
+
+            <div id="feedbackContainer" class="feedback-container"></div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form" novalidate>
+                <!-- Error alert for form-wide errors -->
+                <div id="formError" class="alert alert-danger hidden" role="alert" aria-live="assertive"></div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
                     <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        autocomplete="current-password"
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
                         required
                         aria-required="true"
-                        data-validation="required minlength:8"
                     >
-                    <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password">
-                        Show
-                    </button>
+                    <div class="validation-message error-message" id="emailValidation">Please enter your email</div>
                 </div>
-                <div class="error-message" id="password-error">Please enter your password</div>
-            </div>
 
-            <!-- Remember me checkbox -->
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">Remember me</label>
-            </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                            aria-required="true"
+                            data-validation="required minlength:8"
+                        >
+                        <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password">
+                            Show
+                        </button>
+                    </div>
+                    <div class="validation-message error-message" id="passwordValidation">Please enter your password</div>
+                </div>
 
-            <div class="success-message" id="loginSuccess">Login successful! Redirecting...</div>
+                <div class="success-message" id="loginSuccess">Login successful! Redirecting...</div>
 
-            <!-- Form actions -->
-            <div class="form-actions">
-                <button type="submit" id="loginButton" class="btn btn-primary">
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password" id="forgotPassword">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="submit-button" id="loginButton">
                     <span id="loadingIndicator" class="loading-indicator hidden"></span>
-                    <span id="buttonText">Log In</span>
+                    <span id="buttonText">Login</span>
                 </button>
-                <a href="#forgot-password" class="forgot-password" id="forgotPassword">Forgot password?</a>
-            </div>
+                
+                <p class="signup-link">Don't have an account? <a href="#signup" id="createAccount">Sign up</a></p>
+            </form>
 
-            <!-- Sign up link -->
-            <div class="signup-link">
-                Don't have an account? <a href="#signup" id="createAccount">Sign up</a>
-            </div>
-        </form>
-
-        <!-- Alternative login methods -->
-        <div class="alternative-login">
-            <p class="divider"><span>Or log in with</span></p>
-            <div class="social-buttons">
-                <button type="button" class="btn btn-social btn-google">Google</button>
-                <button type="button" class="btn btn-social btn-facebook">Facebook</button>
+            <!-- Alternative login methods -->
+            <div class="alternative-login">
+                <p class="divider"><span>Or login with</span></p>
+                <div class="social-buttons">
+                    <button type="button" class="btn btn-social btn-google">Google</button>
+                    <button type="button" class="btn btn-social btn-facebook">Facebook</button>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- Scripts -->
-    <script src="validation.js"></script>
-    <script src="auth.js"></script>
-    <script src="feedback.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/auth.js"></script>
     <script>
     // Fallback inline script for critical functionality
     document.addEventListener('DOMContentLoaded', function() {
         // Basic form validation
         const loginForm = document.getElementById('loginForm');
-        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('loginButton');
         const loadingIndicator = document.getElementById('loadingIndicator');
@@ -199,9 +199,13 @@
 
                 let hasErrors = false;
 
-                // Validate username
-                if (!usernameInput.value.trim()) {
-                    document.querySelector('.form-group:has(#username)').classList.add('error');
+                // Validate email
+                if (!emailInput.value.trim()) {
+                    document.querySelector('.form-group:has(#email)').classList.add('error');
+                    hasErrors = true;
+                } else if (!/^\S+@\S+\.\S+$/.test(emailInput.value.trim())) {
+                    document.querySelector('.form-group:has(#email)').classList.add('error');
+                    document.getElementById('emailValidation').textContent = 'Please enter a valid email address';
                     hasErrors = true;
                 }
 
@@ -211,7 +215,7 @@
                     hasErrors = true;
                 } else if (passwordInput.value.length < 8) {
                     document.querySelector('.form-group:has(#password)').classList.add('error');
-                    document.getElementById('password-error').textContent = 'Password must be at least 8 characters long';
+                    document.getElementById('passwordValidation').textContent = 'Password must be at least 8 characters long';
                     hasErrors = true;
                 }
 
@@ -230,7 +234,7 @@
                     try {
                         // For testing purposes - in production, this would call your actual authentication code
                         if (typeof performLogin === 'function') {
-                            performLogin(usernameInput.value, passwordInput.value)
+                            performLogin(emailInput.value, passwordInput.value)
                                 .then(() => {
                                     // Show success message
                                     loginSuccess.classList.add('visible');
@@ -243,11 +247,11 @@
                                     loginButton.disabled = false;
                                     loginButton.classList.remove('btn-loading');
                                     loadingIndicator.classList.add('hidden');
-                                    buttonText.textContent = 'Log In';
+                                    buttonText.textContent = 'Login';
                                 });
                         } else {
                             // Fallback if auth.js is not loaded correctly
-                            console.log('Login attempted with:', usernameInput.value);
+                            console.log('Login attempted with:', emailInput.value);
 
                             // For demo only - show success
                             loginSuccess.classList.add('visible');
@@ -258,7 +262,7 @@
                             loginButton.disabled = false;
                             loginButton.classList.remove('btn-loading');
                             loadingIndicator.classList.add('hidden');
-                            buttonText.textContent = 'Log In';
+                            buttonText.textContent = 'Login';
                         }
                     } catch (error) {
                         console.error('Login error:', error);
@@ -268,7 +272,7 @@
                         loginButton.disabled = false;
                         loginButton.classList.remove('btn-loading');
                         loadingIndicator.classList.add('hidden');
-                        buttonText.textContent = 'Log In';
+                        buttonText.textContent = 'Login';
                     }
                 }, 1000); // Simulate network request
             });
