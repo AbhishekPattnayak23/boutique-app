@@ -1,0 +1,250 @@
+/* Boutique Login Page Styles - Responsive Design */
+
+/* CSS Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+}
+
+:root {
+  --primary-color: #6a5acd;
+  --accent-color: #9370db;
+  --text-color: #333;
+  --light-text: #fff;
+  --error-color: #e74c3c;
+  --success-color: #2ecc71;
+  --border-radius: 8px;
+  --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  padding: 20px;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+/* Container Styles */
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  text-align: center;
+}
+
+/* Logo and Header Styles */
+.logo {
+  max-width: 120px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin-bottom: 30px;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 24px;
+}
+
+/* Form Styles */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  transition: var(--transition);
+}
+
+input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.2);
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 38px;
+  cursor: pointer;
+  color: #999;
+}
+
+/* Button Styles */
+.btn {
+  padding: 14px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--light-text);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Helper Links */
+.helper-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.helper-links a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.helper-links a:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+/* Error Messages */
+.error-message {
+  color: var(--error-color);
+  font-size: 14px;
+  margin-top: 5px;
+  display: none;
+}
+
+.error-message.visible {
+  display: block;
+}
+
+input.error {
+  border-color: var(--error-color);
+}
+
+/* Success Messages */
+.success-message {
+  color: var(--success-color);
+  font-size: 14px;
+  margin-top: 15px;
+  display: none;
+}
+
+.success-message.visible {
+  display: block;
+}
+
+/* Loading State */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  color: transparent;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--light-text);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 25px;
+  }
+
+  h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  input, .btn {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .password-toggle {
+    top: 34px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #2d3436 0%, #1a1a1a 100%);
+    color: #f1f1f1;
+  }
+
+  .login-container {
+    background-color: #2a2a2a;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  h1, label {
+    color: #f1f1f1;
+  }
+
+  input {
+    background-color: #3a3a3a;
+    border-color: #444;
+    color: #f1f1f1;
+  }
+
+  .helper-links a {
+    color: var(--accent-color);
+  }
+}
