@@ -1,10 +1,13 @@
 /**
  * User Feedback Module
  * Provides visual feedback for form interactions and login attempts
+ * @version 1.0.0
  */
 
 // Self-invoking function to avoid polluting global namespace
 (function() {
+  'use strict';
+  
   // Configuration
   const config = {
     animationDuration: 300, // ms
@@ -163,6 +166,54 @@
     showInfo: (message) => showNotification(message, NOTIFICATION_TYPES.INFO),
     showWarning: (message) => showNotification(message, NOTIFICATION_TYPES.WARNING)
   };
+
+  // Legacy feedback system integration
+  const feedbackElement = document.getElementById('feedbackMessage');
+  if (feedbackElement) {
+    function showFeedback(message, isSuccess, duration = null) {
+      try {
+        feedbackElement.className = 'feedback-message show';
+        feedbackElement.classList.add(isSuccess ? 'feedback-success' : 'feedback-error');
+        
+        const iconHTML = `<img src="${isSuccess ? 'success.svg' : 'error.svg'}"
+          alt="${isSuccess ? 'Success' : 'Error'}"
+          class="feedback-icon"
+          width="16"
+          height="16">`;
+        feedbackElement.innerHTML = iconHTML + ' ' + message;
+        
+        if (duration && typeof duration === 'number') {
+          setTimeout(() => {
+            hideFeedback();
+          }, duration);
+        }
+      } catch (error) {
+        console.error('Error displaying feedback:', error);
+      }
+    }
+
+    function hideFeedback() {
+      try {
+        feedbackElement.classList.remove('show');
+      } catch (error) {
+        console.error('Error hiding feedback:', error);
+      }
+    }
+
+    feedbackElement.addEventListener('click', hideFeedback);
+
+    window.feedbackSystem = {
+      showFeedback,
+      hideFeedback
+    };
+
+    if (typeof module !== 'undefined' && module.exports) {
+      module.exports = {
+        showFeedback,
+        hideFeedback
+      };
+    }
+  }
 })();
 
 // Feedback display configuration
@@ -428,56 +479,5 @@ function escapeHtml(text) {
 document.addEventListener('DOMContentLoaded', () => {
   try {
     window.feedbackManager = new FeedbackManager();
-    console.log('Feedback manager initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize feedback manager:', error);
   }
 });
-
-// Export the FeedbackManager class
-window.FeedbackManager = FeedbackManager;
-
-// Expose simple display feedback API for backward compatibility
-window.displayFeedback = function(type, message, duration = 5000) {
-  // Validate inputs
-  if (!type || !message) {
-    console.error('Feedback requires both type and message');
-    return;
-  }
-
-  // Validate type
-  const validTypes = ['success', 'error', 'info', 'warning'];
-  if (!validTypes.includes(type)) {
-    console.error(`Invalid feedback type: ${type}. Must be one of: ${validTypes.join(', ')}`);
-    type = 'info'; // Default to info
-  }
-
-  // Log to console for debugging
-  console.log(`FEEDBACK [${type}]: ${message}`);
-  
-  // Use the feedbackManager if available
-  if (window.feedbackManager) {
-    if (type === 'success') {
-      return window.feedbackManager.success(escapeHtml(message), duration);
-    } else if (type === 'error') {
-      return window.feedbackManager.error(escapeHtml(message), duration);
-    } else if (type === 'warning') {
-      return window.feedbackManager.warning(escapeHtml(message), duration);
-    } else {
-      return window.feedbackManager.info(escapeHtml(message), duration);
-    }
-  } else {
-    // Fallback to Feedback if available
-    if (window.Feedback) {
-      if (type === 'success') {
-        return window.Feedback.showSuccess(escapeHtml(message));
-      } else if (type === 'error') {
-        return window.Feedback.showError(escapeHtml(message));
-      } else if (type === 'warning') {
-        return window.Feedback.showWarning(escapeHtml(message));
-      } else {
-        return window.Feedback.showInfo(escapeHtml(message));
-      }
-    }
-  }
-};

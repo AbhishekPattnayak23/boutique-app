@@ -163,6 +163,14 @@ input.invalid, input.error, .has-error {
   background-color: #fff5f7;
 }
 
+.form-input.error {
+  border-color: #e74c3c;
+}
+
+.form-input.success {
+  border-color: #2ecc71;
+}
+
 .password-toggle {
   position: absolute;
   right: 15px;
@@ -253,12 +261,37 @@ input.invalid, input.error, .has-error {
   font-size: 0.9rem;
 }
 
+.form-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.forgot-password {
+  color: #4a90e2;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  color: #3a7bc8;
+  text-decoration: underline;
+}
+
 /* Error Messages */
 .error-message, .validation-error {
   color: var(--error-color);
   font-size: 14px;
   margin-top: 5px;
   min-height: 20px;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  height: 1.25rem;
+  transition: all 0.3s ease;
 }
 
 .error-message.visible {
@@ -334,6 +367,11 @@ input.invalid, input.error, .has-error {
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Feedback Styling */
@@ -412,6 +450,35 @@ input.invalid, input.error, .has-error {
   color: white;
 }
 
+.feedback-message {
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 500;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.feedback-message.show {
+  opacity: 1;
+  height: auto;
+}
+
+.feedback-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.feedback-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
 .feedback-icon {
   margin-right: 0.5rem;
 }
@@ -426,6 +493,22 @@ input.invalid, input.error, .has-error {
   color: white;
   cursor: pointer;
   font-size: 1.2rem;
+}
+
+/* Remember Me Checkbox */
+.remember-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.remember-checkbox {
+  margin-right: 0.5rem;
+}
+
+.remember-label {
+  font-size: 0.875rem;
+  color: #666;
 }
 
 /* Animation for loading */
@@ -501,6 +584,11 @@ footer {
   .login-container, .container {
     padding: 25px;
   }
+  
+  .login-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
 
   h1, h2 {
     font-size: 20px;
@@ -510,6 +598,14 @@ footer {
   input, .btn, .submit-btn, .btn-login {
     padding: 10px 12px;
     font-size: 14px;
+  }
+  
+  .form-input {
+    padding: 0.6rem;
+  }
+  
+  .btn-login {
+    padding: 0.6rem;
   }
 
   .form-group {

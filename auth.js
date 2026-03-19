@@ -1,10 +1,13 @@
 /**
  * Authentication Module
  * Handles user authentication with comprehensive error handling and validation.
+ * @version 1.0.0
  */
 
 // Self-invoking function to avoid polluting global namespace
 (function() {
+  'use strict';
+  
   // Module state
   const authState = {
     isAuthenticated: false,
@@ -27,21 +30,23 @@
     { username: 'user1', password: 'password1', role: 'user' },
     { username: 'admin', password: 'admin123', role: 'admin' },
     { email: 'test@example.com', password: 'password123', id: 'user-123', role: 'user' },
-    { username: 'user', password: 'user123', role: 'user' }
+    { username: 'user', password: 'user123', role: 'user' },
+    { email: 'demo@example.com', password: 'password123', id: 'user-demo', role: 'user' }
   ];
 
   // DOM Elements
   const elements = {
     form: document.getElementById('loginForm'),
-    email: document.getElementById('email'),
+    email: document.getElementById('email') || document.getElementById('emailField'),
     username: document.getElementById('username'),
-    password: document.getElementById('password'),
+    password: document.getElementById('password') || document.getElementById('passwordField'),
     submitButton: document.getElementById('loginButton'),
     successMessage: document.getElementById('loginSuccess'),
     forgotPassword: document.getElementById('forgotPassword'),
     createAccount: document.getElementById('createAccount'),
     authStatus: document.getElementById('auth-status'),
-    logoutButton: document.getElementById('logout-button')
+    logoutButton: document.getElementById('logout-button'),
+    feedbackMessage: document.getElementById('feedbackMessage')
   };
 
   /**
@@ -119,11 +124,10 @@
     // Get form data - support both email and username fields
     const identifier = elements.email ? elements.email.value.trim() : 
                       (elements.username ? elements.username.value.trim() : '');
-    const password = elements.password.value;
+    const password = elements.password ? elements.password.value.trim() : '';
 
     // Validate inputs
-    if (!identifier || !password) {
-      showErrorMessage('Username/email and password are required');
+    if (!validateFormBeforeSubmit(identifier, password)) {
       return;
     }
 
@@ -148,6 +152,14 @@
             id: response.user.id,
             role: response.user.role
           }));
+
+          // Also save to localStorage for compatibility
+          try {
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('userEmail', response.user.email);
+          } catch (storageError) {
+            console.warn('LocalStorage not available:', storageError);
+          }
 
           showSuccessMessage('Login successful! Redirecting...');
           updateAuthUI();
@@ -191,6 +203,8 @@
     authState.isAuthenticated = false;
     authState.currentUser = null;
     sessionStorage.removeItem('currentUser');
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userEmail');
     showFeedback('info', 'You have been logged out');
     updateAuthUI();
 
@@ -230,13 +244,97 @@
     });
   }
 
+  /**
+   * Validates form fields before submission
+   * @param {string} email - User email or username
+   * @param {string} password - User password
+   * @returns {boolean} - Validation result
+   */
+  function validateFormBeforeSubmit(email, password) {
+    clearErrors();
+    let isValid = true;
+
+    if (!email) {
+      showInputError('email', 'Email/username is required');
+      isValid = false;
+    } else if (email.includes('@') && !isValidEmail(email)) {
+      showInputError('email', 'Please enter a valid email address');
+      isValid = false;
+    }
+
+    if (!password) {
+      showInputError('password', 'Password is required');
+      isValid = false;
+    } else if (password.length < 6) {
+      showInputError('password', 'Password must be at least 6 characters');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  /**
+   * Shows error for a specific input field
+   * @param {string} fieldId - The input field ID
+   * @param {string} message - Error message to display
+   */
+  function showInputError(fieldId, message) {
+    try {
+      const field = document.getElementById(fieldId) || 
+                    document.getElementById(`${fieldId}Field`);
+      const errorElement = document.getElementById(`${fieldId}Error`) || 
+                          document.getElementById(`${fieldId}FieldError`);
+                          
+      if (field && errorElement) {
+        field.classList.add('error');
+        errorElement.textContent = message;
+      }
+    } catch (error) {
+      console.error('Error showing input error:', error);
+    }
+  }
+
+  /**
+   * Clears all form errors
+   */
+  function clearErrors() {
+    try {
+      const errorElements = document.querySelectorAll('.error-message');
+      const inputFields = document.querySelectorAll('.form-input');
+      
+      errorElements.forEach(element => {
+        element.textContent = '';
+      });
+      
+      inputFields.forEach(field => {
+        field.classList.remove('error');
+      });
+    } catch (error) {
+      console.error('Error clearing form errors:', error);
+    }
+  }
+
+  /**
+   * Validates email format
+   * @param {string} email - Email to validate
+   * @returns {boolean} - Is email valid
+   */
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
   // Helper: Set loading state
   function setLoadingState(isLoading) {
     if (elements.submitButton) {
       if (isLoading) {
         elements.submitButton.classList.add('btn-loading');
+        elements.submitButton.disabled = true;
+        elements.submitButton.textContent = 'Logging in...';
       } else {
         elements.submitButton.classList.remove('btn-loading');
+        elements.submitButton.disabled = false;
+        elements.submitButton.textContent = 'Log In';
       }
     }
   }
@@ -262,27 +360,33 @@
    * @param {string} message - The message to display
    */
   function showFeedback(type, message) {
-    if (typeof displayFeedback === 'function') {
-      displayFeedback(type, message);
-    } else {
-      console.log(`${type.toUpperCase()}: ${message}`);
-
-      // For simple demo, show alert (in production, use a better UI component)
-      if (type === 'error') {
-        alert('Error: ' + message);
-      } else if (type === 'success' && !elements.successMessage) {
-        alert('Success: ' + message);
+    try {
+      if (elements.feedbackMessage) {
+        elements.feedbackMessage.textContent = message;
+        elements.feedbackMessage.className = 'feedback-message show';
+        
+        if (type === 'success') {
+          elements.feedbackMessage.classList.add('feedback-success');
+        } else if (type === 'error') {
+          elements.feedbackMessage.classList.add('feedback-error');
+        }
+      } else if (typeof displayFeedback === 'function') {
+        displayFeedback(type, message);
+      } else {
+        console.log(`${type.toUpperCase()}: ${message}`);
+  
+        // For simple demo, show alert (in production, use a better UI component)
+        if (type === 'error') {
+          alert('Error: ' + message);
+        } else if (type === 'success' && !elements.successMessage) {
+          alert('Success: ' + message);
+        }
       }
+    } catch (error) {
+      console.error('Error showing feedback:', error);
     }
   }
 
-  // Initialize when DOM is loaded
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAuth);
-  } else {
-    initAuth();
-  }
-  
   /**
    * Authenticates a user with the provided credentials
    * @param {string} username - The username or email to authenticate
@@ -335,17 +439,30 @@
       }, 1000); // Simulate network delay
     });
   }
-})();
 
-// Expose public API
-window.auth = {
-  isAuthenticated: () => authState.isAuthenticated,
-  getCurrentUser: () => authState.currentUser,
-  logout: handleLogout,
-  authenticateUser: authenticateUser
-};
+  // Initialize when DOM is loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAuth);
+  } else {
+    initAuth();
+  }
+
+  // Expose public API
+  window.auth = {
+    isAuthenticated: () => authState.isAuthenticated,
+    getCurrentUser: () => authState.currentUser,
+    logout: handleLogout,
+    authenticateUser: authenticateUser,
+    validateForm: validateFormBeforeSubmit,
+    isValidEmail: isValidEmail
+  };
+})();
 
 // Export for module environments
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { authenticateUser };
+  module.exports = { 
+    authenticateUser: window.auth.authenticateUser,
+    validateFormBeforeSubmit: window.auth.validateForm,
+    isValidEmail: window.auth.isValidEmail
+  };
 }

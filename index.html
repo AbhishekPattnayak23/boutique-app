@@ -11,6 +11,24 @@
     <!-- Fallback inline styles if external CSS fails to load -->
     <style>
         /* Critical styles for functionality */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('bg-pattern.png');
+            background-size: 300px;
+            background-repeat: repeat;
+        }
         .error-message {
             color: #d32f2f;
             font-size: 0.85rem;
@@ -41,6 +59,7 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
         }
 
         .form-actions {
@@ -82,6 +101,38 @@
         .status-logged-out {
             color: #d32f2f;
         }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.2s ease;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .btn-login:hover {
+            background-color: #3a7bc8;
+        }
     </style>
 </head>
 <body>
@@ -111,6 +162,7 @@
                         type="email"
                         id="email"
                         name="email"
+                        class="form-input"
                         placeholder="Enter your email"
                         autocomplete="email"
                         required
@@ -126,6 +178,7 @@
                             type="password"
                             id="password"
                             name="password"
+                            class="form-input"
                             placeholder="Enter your password"
                             autocomplete="current-password"
                             required
@@ -149,7 +202,7 @@
                     <a href="#" class="forgot-password" id="forgotPassword">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="submit-button" id="loginButton">
+                <button type="submit" class="btn-login" id="loginButton">
                     <span id="loadingIndicator" class="loading-indicator hidden"></span>
                     <span id="buttonText">Login</span>
                 </button>
@@ -186,9 +239,10 @@
         </footer>
     </div>
 
-    <script src="js/validation.js"></script>
-    <script src="js/feedback.js"></script>
-    <script src="js/auth.js"></script>
+    <!-- Deferred JavaScript loading -->
+    <script src="js/validation.js" defer></script>
+    <script src="js/feedback.js" defer></script>
+    <script src="js/auth.js" defer></script>
     <script>
     // Fallback inline script for critical functionality
     document.addEventListener('DOMContentLoaded', function() {
@@ -304,18 +358,13 @@
 
                             // For demo only - show success
                             loginSuccess.classList.add('visible');
-                            formError.textContent = 'Demo mode: Auth successful (no actual authentication performed)';
-                            formError.classList.remove('hidden');
-                            formError.classList.add('alert-success');
                             
-                            // Update auth status
-                            authStatus.textContent = 'Logged in as ' + emailInput.value;
-                            authStatus.className = 'status-logged-in';
-
-                            loginButton.disabled = false;
-                            loginButton.classList.remove('btn-loading');
-                            loadingIndicator.classList.add('hidden');
-                            buttonText.textContent = 'Login';
+                            setTimeout(() => {
+                                loginButton.disabled = false;
+                                loginButton.classList.remove('btn-loading');
+                                loadingIndicator.classList.add('hidden');
+                                buttonText.textContent = 'Login';
+                            }, 1500);
                         }
                     } catch (error) {
                         console.error('Login error:', error);

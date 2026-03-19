@@ -1,6 +1,7 @@
 /**
  * Form Validation Module
  * Provides comprehensive client-side validation for form inputs
+ * @version 1.0.0
  */
 
 // Validation configuration - can be extended for more validation types
@@ -32,6 +33,24 @@ const validationRules = {
     message: `Must match ${fieldName || field}`
   })
 };
+
+/**
+ * Creates a debounced function to prevent rapid execution
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Milliseconds to wait
+ * @returns {Function} - Debounced function
+ */
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 
 /**
  * Validates the login form input fields
@@ -378,89 +397,51 @@ class FormValidator {
   validateField(validator) {
     const errorMessage = validator.validate();
     validator.errorElement.textContent = errorMessage || '';
-    validator.element.classList.toggle('invalid', !!errorMessage);
-    return !errorMessage;
+    
+    if (errorMessage) {
+      validator.element.classList.add('invalid');
+      validator.element.classList.remove('valid');
+      return false;
+    } else {
+      validator.element.classList.remove('invalid');
+      validator.element.classList.add('valid');
+      return true;
+    }
   }
-
+  
   // Validate the entire form
   validateForm() {
     let isValid = true;
-
+    
+    // Validate each field
     Object.values(this.validators).forEach(validator => {
       if (!this.validateField(validator)) {
         isValid = false;
       }
     });
-
+    
     return isValid;
   }
-
+  
   // Handle form submission
   handleFormSubmission() {
     if (this.formStatus) {
-      this.formStatus.textContent = 'Validating...';
-      this.formStatus.classList.add('status-info');
-      this.formStatus.classList.remove('status-error', 'status-success');
+      this.formStatus.textContent = 'Form submitted successfully!';
+      this.formStatus.className = 'status-success';
     }
-
-    // This is where you would call your auth logic
-    if (typeof authenticateUser === 'function') {
-      const emailValue = this.validators.email.element.value;
-      const passwordValue = this.validators.password.element.value;
-
-      try {
-        authenticateUser(emailValue, passwordValue)
-          .then(result => {
-            this.showSubmissionResult(true, 'Login successful!');
-          })
-          .catch(error => {
-            this.showSubmissionResult(false, error.message || 'Authentication failed');
-          });
-      } catch (error) {
-        this.showSubmissionResult(false, 'An error occurred during authentication');
-        console.error('Authentication error:', error);
-      }
-    } else {
-      console.log('Form is valid! Ready for submission');
-      this.showSubmissionResult(true, 'Form validated successfully (auth.js not loaded)');
-    }
-  }
-
-  // Display submission result to user
-  showSubmissionResult(isSuccess, message) {
-    if (this.formStatus) {
-      this.formStatus.textContent = message;
-      this.formStatus.classList.remove('status-info');
-
-      if (isSuccess) {
-        this.formStatus.classList.add('status-success');
-        this.formStatus.classList.remove('status-error');
-      } else {
-        this.formStatus.classList.add('status-error');
-        this.formStatus.classList.remove('status-success');
-      }
-    }
+    
+    // Additional form submission logic can go here
+    console.log('Form validated and submitted');
   }
 }
 
-// Initialize validation
-initFormValidation();
-
-// Initialize validation when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    window.formValidator = new FormValidator('loginForm');
-  } catch (error) {
-    console.error('Failed to initialize form validation:', error);
-  }
-});
-
-// Export utility functions for testing and reuse
-window.FormValidator = FormValidator;
-window.validationRules = validationRules;
-window.validateForm = validateForm;
-
-// Export validation functions for use in other modules
+// Export functions for module usage
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { validateLoginForm };
+  module.exports = {
+    validateForm,
+    validateLoginForm,
+    FormValidator,
+    validationRules,
+    debounce
+  };
 }
