@@ -1,6 +1,6 @@
 /**
  * User Feedback Module
- * Provides visual feedback for form interactions
+ * Provides visual feedback for form interactions and login attempts
  */
 
 // Self-invoking function to avoid polluting global namespace
@@ -173,9 +173,21 @@ const feedbackConfig = {
 
 // Feedback controller
 class FeedbackManager {
-  constructor(config = {}) {
+  constructor(config = {}, feedbackElementId = 'login-feedback') {
     this.config = { ...feedbackConfig, ...config };
     this.container = this.createFeedbackContainer();
+    
+    // Support for login-specific feedback element
+    this.feedbackElement = document.getElementById(feedbackElementId);
+    if (!this.feedbackElement) {
+      console.error(`Feedback element with ID "${feedbackElementId}" not found!`);
+    }
+
+    // Bind login form submission
+    this.bindLoginForm();
+
+    // Initialize logging
+    this.logEvent('Feedback system initialized');
   }
 
   // Create feedback container
@@ -270,11 +282,31 @@ class FeedbackManager {
 
   // Show success feedback
   success(message, duration) {
+    if (this.feedbackElement) {
+      this.feedbackElement.className = 'feedback-container feedback-success';
+      this.feedbackElement.textContent = message;
+      this.logEvent(`Success: ${message}`);
+
+      // Auto-hide after duration
+      setTimeout(() => {
+        this.hideMessage();
+      }, duration || 5000);
+    }
     return this.show(message, 'success', duration);
   }
 
   // Show error feedback
   error(message, duration) {
+    if (this.feedbackElement) {
+      this.feedbackElement.className = 'feedback-container feedback-error';
+      this.feedbackElement.textContent = message;
+      this.logEvent(`Error: ${message}`);
+
+      // Auto-hide after duration
+      setTimeout(() => {
+        this.hideMessage();
+      }, duration || 5000);
+    }
     return this.show(message, 'error', duration);
   }
 
@@ -286,6 +318,90 @@ class FeedbackManager {
   // Show info feedback
   info(message, duration) {
     return this.show(message, 'info', duration);
+  }
+
+  /**
+   * Display a loading message during async operations
+   * @param {string} message - The loading message to display
+   */
+  showLoading(message = 'Processing your request...') {
+    if (this.feedbackElement) {
+      this.feedbackElement.className = 'feedback-container feedback-loading';
+      this.feedbackElement.textContent = message;
+      this.logEvent('Loading state activated');
+    }
+    return this.show(message, 'info');
+  }
+
+  /**
+   * Hide the current feedback message
+   */
+  hideMessage() {
+    if (this.feedbackElement) {
+      this.feedbackElement.className = 'feedback-container';
+      this.feedbackElement.textContent = '';
+    }
+  }
+
+  /**
+   * Bind the login form submission to handle feedback
+   */
+  bindLoginForm() {
+    const loginForm = document.getElementById('loginForm');
+
+    if (!loginForm) {
+      console.log('Login form not found!');
+      return;
+    }
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Get form values
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Validate input client-side first
+      if (typeof validateLoginForm === 'function' && !validateLoginForm(username, password)) {
+        return;
+      }
+
+      // Show loading state
+      this.showLoading('Authenticating...');
+
+      try {
+        // Attempt to authenticate user
+        if (typeof authenticateUser === 'function') {
+          const result = await authenticateUser(username, password);
+
+          // Handle authentication result
+          if (result.success) {
+            this.success(result.message || 'Login successful!');
+
+            // Simulate redirect after successful login
+            setTimeout(() => {
+              this.showLoading('Redirecting to dashboard...');
+              // In a real app, this would redirect to another page
+            }, 1000);
+          } else {
+            this.error(result.message || 'Login failed.');
+          }
+        }
+      } catch (error) {
+        // Handle authentication errors
+        this.error(error.message || 'An unexpected error occurred.');
+        console.error('Authentication error:', error);
+      }
+    });
+  }
+
+  /**
+   * Log events for debugging
+   * @param {string} message - The message to log
+   */
+  logEvent(message) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${message}`);
   }
 }
 

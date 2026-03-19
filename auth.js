@@ -12,6 +12,13 @@
     requestTimeout: 8000         // 8 seconds timeout
   };
 
+  // Demo user data (in production this would come from a secure backend)
+  const validUsers = [
+    { username: 'user1', password: 'password1' },
+    { username: 'admin', password: 'admin123' },
+    { email: 'test@example.com', password: 'password123', id: 'user-123' }
+  ];
+
   // DOM Elements
   const elements = {
     form: document.getElementById('loginForm'),
@@ -127,35 +134,52 @@
 })();
 
 /**
- * Simulate authentication with a Promise
+ * Authenticates a user with the provided credentials
+ * @param {string} username - The username or email to authenticate
+ * @param {string} password - The password to authenticate
+ * @returns {Promise<Object>} - Promise resolving to authentication result
  */
-function authenticateUser(email, password) {
+function authenticateUser(username, password) {
   return new Promise((resolve, reject) => {
-    console.log(`Authentication attempt for email: ${email}`);
+    console.log(`Authentication attempt for user: ${username}`);
 
     // Simulate network delay
     setTimeout(() => {
       try {
-        // Demo validation - in production this would call an API
-        if (!email || !password) {
-          return reject(new Error('Email and password are required'));
+        // Validate inputs
+        if (!username || !password) {
+          return reject(new Error('Username/email and password are required'));
         }
 
-        // For demo purposes only - NEVER use this in production
-        // This is just to demonstrate the validation flow
-        if (email === 'test@example.com' && password === 'password123') {
+        // Find user by username or email
+        const user = validUsers.find(u => 
+          (u.username === username || u.email === username) && u.password === password
+        );
+
+        if (user) {
           console.log('Authentication successful');
-          return resolve({
+          resolve({
             success: true,
-            user: { email, id: 'user-123' }
+            user: { 
+              username: user.username,
+              email: user.email,
+              id: user.id
+            },
+            message: 'Login successful'
+          });
+        } else {
+          console.log('Authentication failed - invalid credentials');
+          resolve({
+            success: false,
+            message: 'Invalid username/email or password'
           });
         }
-
-        console.log('Authentication failed - invalid credentials');
-        reject(new Error('Invalid email or password'));
       } catch (error) {
         console.error('Authentication error:', error);
-        reject(new Error('Authentication failed'));
+        reject({
+          success: false,
+          message: error.message || 'Authentication failed'
+        });
       }
     }, 1000); // Simulate network delay
   });
@@ -163,3 +187,8 @@ function authenticateUser(email, password) {
 
 // Export the authentication function
 window.authenticateUser = authenticateUser;
+
+// Export for module environments
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { authenticateUser };
+}
