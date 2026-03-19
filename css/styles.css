@@ -1,0 +1,356 @@
+/* Base styles and CSS Reset */
+:root {
+    --primary-color: #4a6fa5;
+    --primary-hover: #3b5a88;
+    --secondary-color: #f8f9fa;
+    --text-color: #333;
+    --error-color: #dc3545;
+    --success-color: #28a745;
+    --border-color: #dee2e6;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+    --border-radius: 4px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Apply system font stack for performance */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #f5f5f5;
+    background-image: url('../assets/images/bg-pattern.png');
+    background-size: 300px;
+    background-repeat: repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Container styling */
+.container {
+    width: 100%;
+    padding: 0 15px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.login-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    position: relative;
+    transform: translateZ(0); /* Hardware acceleration */
+    will-change: transform, opacity; /* Optimize animations */
+}
+
+/* Logo and header styling */
+.logo-container {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.logo {
+    max-width: 120px;
+    height: auto;
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+/* Form styling with optimized selectors */
+.login-form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: border-color var(--transition-speed) ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+}
+
+.form-input.error {
+    border-color: var(--error-color);
+}
+
+/* Password field styling */
+.password-container {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Error messages */
+.error-message {
+    color: var(--error-color);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    min-height: 1rem;
+    transition: all var(--transition-speed) ease;
+}
+
+/* Remember me checkbox */
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 0.5rem;
+}
+
+.remember-me label {
+    margin-bottom: 0;
+    font-weight: normal;
+}
+
+/* Button styling */
+.login-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+    position: relative;
+}
+
+.login-button:hover {
+    background-color: var(--primary-hover);
+}
+
+.button-loader {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loading .button-text {
+    visibility: hidden;
+}
+
+.loading .button-loader {
+    display: block;
+}
+
+/* Form links */
+.form-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+}
+
+.form-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+}
+
+.form-links a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Password strength meter */
+.password-strength-meter {
+    height: 4px;
+    width: 100%;
+    margin-top: 0.5rem;
+    background-color: #ddd;
+    position: relative;
+    transition: all var(--transition-speed) ease;
+}
+
+.password-strength-meter::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 0;
+    background-color: var(--error-color);
+    transition: width var(--transition-speed) ease, background-color var(--transition-speed) ease;
+}
+
+.password-strength-meter.weak::before {
+    width: 25%;
+    background-color: var(--error-color);
+}
+
+.password-strength-meter.medium::before {
+    width: 50%;
+    background-color: #ffa500;
+}
+
+.password-strength-meter.strong::before {
+    width: 75%;
+    background-color: #9acd32;
+}
+
+.password-strength-meter.very-strong::before {
+    width: 100%;
+    background-color: var(--success-color);
+}
+
+/* Notification area */
+.notification-area {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    transform: translateZ(0); /* Hardware acceleration */
+}
+
+.notification {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: var(--border-radius);
+    background-color: white;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 300px;
+}
+
+.notification.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-icon {
+    margin-right: 0.75rem;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.notification-message {
+    flex-grow: 1;
+    font-size: 0.875rem;
+}
+
+.notification.success {
+    border-left: 4px solid var(--success-color);
+}
+
+.notification.error {
+    border-left: 4px solid var(--error-color);
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1.5rem;
+    }
+
+    .form-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background-image: none;
+    }
+
+    .login-container {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #0040b7;
+        --error-color: #c10000;
+        --success-color: #006800;
+    }
+
+    .form-input {
+        border-width: 2px;
+    }
+
+    .login-button {
+        border: 2px solid black;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.001s !important;
+        animation-duration: 0.001s !important;
+    }
+}
