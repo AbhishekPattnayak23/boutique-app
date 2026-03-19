@@ -15,7 +15,8 @@
     loginAttempts: 0,
     maxLoginAttempts: 3,
     lockedOut: false,
-    lockoutTime: null
+    lockoutTime: null,
+    isLoading: false
   };
 
   // Configuration
@@ -27,8 +28,8 @@
 
   // Valid users (in production this would come from a secure backend)
   const validUsers = [
-    { username: 'user1', password: 'password1', role: 'user' },
-    { username: 'admin', password: 'admin123', role: 'admin' },
+    { username: 'user1', password: 'password1', role: 'user', name: 'Demo User' },
+    { username: 'admin', password: 'admin123', role: 'admin', name: 'Administrator' },
     { email: 'test@example.com', password: 'password123', id: 'user-123', role: 'user' },
     { username: 'user', password: 'user123', role: 'user' },
     { email: 'demo@example.com', password: 'password123', id: 'user-demo', role: 'user' }
@@ -36,11 +37,11 @@
 
   // DOM Elements
   const elements = {
-    form: document.getElementById('loginForm'),
+    form: document.getElementById('loginForm') || document.getElementById('login-form'),
     email: document.getElementById('email') || document.getElementById('emailField'),
     username: document.getElementById('username'),
     password: document.getElementById('password') || document.getElementById('passwordField'),
-    submitButton: document.getElementById('loginButton'),
+    submitButton: document.getElementById('loginButton') || document.getElementById('login-button'),
     successMessage: document.getElementById('loginSuccess'),
     forgotPassword: document.getElementById('forgotPassword'),
     createAccount: document.getElementById('createAccount'),
@@ -56,7 +57,7 @@
     console.log('Authentication system initialized');
 
     // Check for existing session
-    const savedUser = sessionStorage.getItem('currentUser');
+    const savedUser = sessionStorage.getItem('currentUser') || sessionStorage.getItem('user');
     if (savedUser) {
       try {
         authState.currentUser = JSON.parse(savedUser);
@@ -66,6 +67,7 @@
       } catch (error) {
         console.error('Failed to restore session:', error);
         sessionStorage.removeItem('currentUser');
+        sessionStorage.removeItem('user');
       }
     }
 
@@ -125,6 +127,7 @@
     const identifier = elements.email ? elements.email.value.trim() : 
                       (elements.username ? elements.username.value.trim() : '');
     const password = elements.password ? elements.password.value.trim() : '';
+    const remember = e.target.elements.remember ? e.target.elements.remember.checked : false;
 
     // Validate inputs
     if (!validateFormBeforeSubmit(identifier, password)) {
@@ -145,18 +148,24 @@
           authState.currentUser = response.user;
           authState.loginAttempts = 0;
 
-          // Save to session
-          sessionStorage.setItem('currentUser', JSON.stringify({
+          // Save to session or local storage based on "remember me"
+          const storage = remember ? localStorage : sessionStorage;
+          storage.setItem('currentUser', JSON.stringify({
             username: response.user.username || response.user.email,
             email: response.user.email,
             id: response.user.id,
+            name: response.user.name,
             role: response.user.role
+          }));
+          storage.setItem('user', JSON.stringify({
+            username: response.user.username || response.user.email,
+            name: response.user.name || ''
           }));
 
           // Also save to localStorage for compatibility
           try {
             localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('userEmail', response.user.email);
+            localStorage.setItem('userEmail', response.user.email || '');
           } catch (storageError) {
             console.warn('LocalStorage not available:', storageError);
           }
@@ -197,14 +206,51 @@
   }
 
   /**
+   * Authenticate user against the system
+   * @param {string} identifier - Username or email
+   * @param {string} password - User password
+   * @returns {Promise<Object>} - Authentication result
+   */
+  function authenticateUser(identifier, password) {
+    return new Promise((resolve, reject) => {
+      // For demo, we'll use the mock users
+      setTimeout(() => {
+        // Find user by email or username
+        const user = validUsers.find(u => 
+          (u.username && u.username.toLowerCase() === identifier.toLowerCase()) || 
+          (u.email && u.email.toLowerCase() === identifier.toLowerCase())
+        );
+
+        if (user && user.password === password) {
+          resolve({
+            success: true,
+            user: user,
+            message: 'Login successful!'
+          });
+        } else {
+          reject({
+            success: false,
+            message: 'Invalid username/email or password'
+          });
+        }
+      }, 1000);
+    });
+  }
+
+  /**
    * Handle user logout
    */
   function handleLogout() {
     authState.isAuthenticated = false;
     authState.currentUser = null;
+    
+    // Clear all storage
     sessionStorage.removeItem('currentUser');
+    sessionStorage.removeItem('user');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('user');
+    
     showFeedback('info', 'You have been logged out');
     updateAuthUI();
 
@@ -326,6 +372,8 @@
 
   // Helper: Set loading state
   function setLoadingState(isLoading) {
+    authState.isLoading = isLoading;
+    
     if (elements.submitButton) {
       if (isLoading) {
         elements.submitButton.classList.add('btn-loading');
@@ -370,99 +418,41 @@
         } else if (type === 'error') {
           elements.feedbackMessage.classList.add('feedback-error');
         }
+      } else if (typeof FeedbackManager !== 'undefined') {
+        if (type === 'success') {
+          FeedbackManager.showSuccess(message);
+        } else if (type === 'error') {
+          FeedbackManager.showError(message);
+        } else {
+          FeedbackManager.showMessage(message);
+        }
       } else if (typeof displayFeedback === 'function') {
         displayFeedback(type, message);
       } else {
         console.log(`${type.toUpperCase()}: ${message}`);
-  
-        // For simple demo, show alert (in production, use a better UI component)
-        if (type === 'error') {
-          alert('Error: ' + message);
-        } else if (type === 'success' && !elements.successMessage) {
-          alert('Success: ' + message);
-        }
       }
     } catch (error) {
       console.error('Error showing feedback:', error);
     }
   }
+  
+  // Initialize on DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', initAuth);
 
-  /**
-   * Authenticates a user with the provided credentials
-   * @param {string} username - The username or email to authenticate
-   * @param {string} password - The password to authenticate
-   * @returns {Promise<Object>} - Promise resolving to authentication result
-   */
-  function authenticateUser(username, password) {
-    return new Promise((resolve, reject) => {
-      console.log(`Authentication attempt for user: ${username}`);
-
-      // Simulate network delay
-      setTimeout(() => {
-        try {
-          // Validate inputs
-          if (!username || !password) {
-            return reject(new Error('Username/email and password are required'));
-          }
-
-          // Find user by username or email
-          const user = validUsers.find(u => 
-            (u.username === username || u.email === username) && u.password === password
-          );
-
-          if (user) {
-            console.log('Authentication successful');
-            resolve({
-              success: true,
-              user: { 
-                username: user.username,
-                email: user.email,
-                id: user.id,
-                role: user.role
-              },
-              message: 'Login successful'
-            });
-          } else {
-            console.log('Authentication failed - invalid credentials');
-            resolve({
-              success: false,
-              message: 'Invalid username/email or password'
-            });
-          }
-        } catch (error) {
-          console.error('Authentication error:', error);
-          reject({
-            success: false,
-            message: error.message || 'Authentication failed'
-          });
-        }
-      }, 1000); // Simulate network delay
-    });
-  }
-
-  // Initialize when DOM is loaded
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAuth);
-  } else {
-    initAuth();
-  }
-
-  // Expose public API
-  window.auth = {
+  // Make Auth object available globally if needed
+  window.Auth = {
+    login: authenticateUser,
+    logout: handleLogout,
     isAuthenticated: () => authState.isAuthenticated,
     getCurrentUser: () => authState.currentUser,
-    logout: handleLogout,
-    authenticateUser: authenticateUser,
-    validateForm: validateFormBeforeSubmit,
-    isValidEmail: isValidEmail
+    storeUserSession: (userData, remember) => {
+      const storage = remember ? localStorage : sessionStorage;
+      try {
+        storage.setItem('currentUser', JSON.stringify(userData));
+        storage.setItem('user', JSON.stringify(userData));
+      } catch (error) {
+        console.error('Error storing user session:', error);
+      }
+    }
   };
 })();
-
-// Export for module environments
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { 
-    authenticateUser: window.auth.authenticateUser,
-    validateFormBeforeSubmit: window.auth.validateForm,
-    isValidEmail: window.auth.isValidEmail
-  };
-}

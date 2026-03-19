@@ -419,65 +419,61 @@ class FeedbackManager {
 
       // Show loading state
       this.showLoading('Authenticating...');
-
-      try {
-        // Attempt to authenticate user
-        if (typeof authenticateUser === 'function') {
-          const result = await authenticateUser(username, password);
-
-          // Handle authentication result
-          if (result.success) {
-            this.success(result.message || 'Login successful!');
-
-            // Simulate redirect after successful login
-            setTimeout(() => {
-              this.showLoading('Redirecting to dashboard...');
-              // In a real app, this would redirect to another page
-            }, 1000);
-          } else {
-            this.error(result.message || 'Login failed.');
-          }
-        }
-      } catch (error) {
-        // Handle authentication errors
-        this.error(error.message || 'An unexpected error occurred.');
-        console.error('Authentication error:', error);
-      }
     });
   }
 
   /**
-   * Log events for debugging
-   * @param {string} message - The message to log
+   * Logs an event for analytics or debugging
+   * @param {string} eventType - The type of event
+   * @param {Object} data - Additional data about the event
    */
-  logEvent(message) {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] ${message}`);
+  logEvent(eventType, data = {}) {
+    const logData = {
+      eventType,
+      timestamp: new Date().toISOString(),
+      ...data
+    };
+
+    console.log('Event logged:', logData);
+
+    // Here you could send the event to an analytics service
+    try {
+      // Example: send to analytics
+      // navigator.sendBeacon('/api/analytics', JSON.stringify(logData));
+    } catch (error) {
+      console.error('Failed to log event:', error);
+    }
+  }
+
+  /**
+   * Clears all feedback messages
+   */
+  clearFeedback() {
+    if (this.feedbackElement) {
+      this.feedbackElement.className = 'feedback-container';
+      this.feedbackElement.textContent = '';
+    }
   }
 }
 
-/**
- * Escape HTML to prevent XSS
- * @param {string} text - Text to escape
- * @returns {string} - Escaped text
- */
-function escapeHtml(text) {
-  if (!text) return '';
+// Set up feedback manager
+document.addEventListener('DOMContentLoaded', function() {
+  // Example of form interaction with feedback
+  const loginForm = document.getElementById('login-form');
 
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  };
+  if (loginForm) {
+    // Clear feedback when form is interacted with
+    loginForm.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', function() {
+        if (window.FeedbackManager && typeof window.FeedbackManager.clearFeedback === 'function') {
+          window.FeedbackManager.clearFeedback();
+        }
+      });
+    });
+  }
 
-  return text.replace(/[&<>"']/g, m => map[m]);
-}
-
-// Initialize feedback manager when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    window.feedbackManager = new FeedbackManager();
+  // Log page load event
+  if (window.FeedbackManager && typeof window.FeedbackManager.logEvent === 'function') {
+    window.FeedbackManager.logEvent('page_view', { page: 'login' });
   }
 });

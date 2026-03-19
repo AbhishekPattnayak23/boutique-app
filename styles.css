@@ -17,6 +17,9 @@
   --border-radius: 8px;
   --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   --transition: all 0.3s ease;
+  --background-color: #f5f5f5;
+  --card-background: #ffffff;
+  --input-border: #ddd;
 }
 
 * {
@@ -279,7 +282,7 @@ input.invalid, input.error, .has-error {
 }
 
 /* Error Messages */
-.error-message, .validation-error {
+.error-message, .validation-error, .error-text {
   color: var(--error-color);
   font-size: 14px;
   margin-top: 5px;
@@ -328,6 +331,29 @@ input.invalid, input.error, .has-error {
   background-color: #f6f9fe;
   color: #2160c4;
   border: 1px solid #3273dc;
+}
+
+/* Alert Styles */
+.alert {
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.alert-danger {
+  background-color: #fde9e9;
+  border: 1px solid #f5c6cb;
+  color: var(--error-color);
+}
+
+.alert-success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: var(--success-color);
+}
+
+.d-none {
+  display: none;
 }
 
 /* Success Messages */
@@ -496,7 +522,7 @@ input.invalid, input.error, .has-error {
 }
 
 /* Remember Me Checkbox */
-.remember-group {
+.remember-group, .remember-me {
   display: flex;
   align-items: center;
   margin-bottom: 1.5rem;
@@ -509,6 +535,10 @@ input.invalid, input.error, .has-error {
 .remember-label {
   font-size: 0.875rem;
   color: #666;
+}
+
+.remember-me input {
+  margin-right: 10px;
 }
 
 /* Animation for loading */
@@ -614,6 +644,26 @@ footer {
 
   .password-toggle {
     top: 34px;
+  }
+}
+
+@media (max-width: 320px) {
+  .login-container {
+    padding: 15px;
+  }
+
+  h2 {
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  .login-container {
+    padding: 40px;
   }
 }
 
