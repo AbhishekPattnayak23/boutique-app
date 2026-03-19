@@ -1,0 +1,244 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    background-image: url('../assets/images/bg-pattern.png');
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+/* Login container styles */
+.login-container {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.logo-container {
+    margin-bottom: 24px;
+}
+
+.logo {
+    max-width: 120px;
+    height: auto;
+}
+
+h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+/* Form styles */
+.login-form {
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 24px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s;
+    outline: none;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #4a80ff;
+    box-shadow: 0 0 0 3px rgba(74, 128, 255, 0.15);
+}
+
+input[type="email"].error,
+input[type="password"].error {
+    border-color: #ff4a4a;
+    box-shadow: 0 0 0 3px rgba(255, 74, 74, 0.15);
+}
+
+input[type="email"].success,
+input[type="password"].success {
+    border-color: #4aff7f;
+    box-shadow: 0 0 0 3px rgba(74, 255, 127, 0.15);
+}
+
+.validation-message {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #ff4a4a;
+    min-height: 20px;
+}
+
+.validation-message.success {
+    color: #2fcc71;
+}
+
+/* Form options */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: #4a80ff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Submit button */
+.submit-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #4a80ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #3a70f0;
+}
+
+.submit-button:active {
+    transform: scale(0.98);
+}
+
+.submit-button:disabled {
+    background-color: #b3c2e6;
+    cursor: not-allowed;
+}
+
+/* Signup link */
+.signup-link {
+    margin-top: 24px;
+    font-size: 14px;
+    color: #666;
+}
+
+.signup-link a {
+    color: #4a80ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Feedback container */
+.feedback-container {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    display: none;
+    font-size: 14px;
+    font-weight: 500;
+    align-items: center;
+    justify-content: center;
+}
+
+.feedback-container.success {
+    background-color: #e6f7ee;
+    color: #2fcc71;
+    border: 1px solid #d1f2e0;
+    display: flex;
+}
+
+.feedback-container.error {
+    background-color: #fdeded;
+    color: #ff4a4a;
+    border: 1px solid #f9d7d7;
+    display: flex;
+}
+
+.feedback-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+    .login-container {
+        padding: 30px 20px;
+    }
+
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .submit-button {
+        padding: 12px;
+    }
+}

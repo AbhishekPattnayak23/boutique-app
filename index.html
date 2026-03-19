@@ -3,249 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure login page with comprehensive validation">
-    <title>Login - Secure Access</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Fallback inline styles if external CSS fails to load -->
-    <style>
-        /* Critical styles for functionality */
-        .error-message {
-            color: #d32f2f;
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .error .error-message {
-            display: block;
-        }
-
-        .error input {
-            border-color: #d32f2f;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .login-container {
-            max-width: 400px;
-            margin: 2rem auto;
-            padding: 2rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1.5rem;
-        }
-
-        .loading-indicator {
-            display: inline-block;
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid rgba(0, 0, 0, 0.2);
-            border-top-color: #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 0.5rem;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <meta name="description" content="Secure login page for Boutique shop">
+    <title>Boutique | Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <main class="login-container">
-        <h1>Log In</h1>
-
-        <!-- Login Form -->
-        <form id="loginForm" novalidate>
-            <!-- Error alert for form-wide errors -->
-            <div id="formError" class="alert alert-danger hidden" role="alert" aria-live="assertive"></div>
-
-            <!-- Username/Email field -->
-            <div class="form-group">
-                <label for="username">Username or Email</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    autocomplete="username"
-                    required
-                    aria-required="true"
-                    data-validation="required"
-                >
-                <div class="error-message" id="username-error">Please enter your username or email</div>
+    <div class="container">
+        <div class="login-container">
+            <div class="logo-container">
+                <img src="assets/images/logo.png" alt="Boutique Logo" class="logo">
             </div>
 
-            <!-- Password field -->
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-container">
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Please login to your account</p>
+
+            <div id="feedbackContainer" class="feedback-container"></div>
+
+            <form id="loginForm" class="login-form" novalidate>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        aria-required="true"
+                    >
+                    <div class="validation-message" id="emailValidation"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
                     <input
                         type="password"
                         id="password"
                         name="password"
+                        placeholder="Enter your password"
                         autocomplete="current-password"
-                        required
                         aria-required="true"
-                        data-validation="required minlength:8"
                     >
-                    <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password">
-                        Show
-                    </button>
+                    <div class="validation-message" id="passwordValidation"></div>
                 </div>
-                <div class="error-message" id="password-error">Please enter your password</div>
-            </div>
 
-            <!-- Remember me checkbox -->
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">Remember me</label>
-            </div>
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
 
-            <!-- Form actions -->
-            <div class="form-actions">
-                <button type="submit" id="loginButton" class="btn btn-primary">
-                    <span id="loadingIndicator" class="loading-indicator hidden"></span>
-                    <span id="buttonText">Log In</span>
-                </button>
-                <a href="#forgot-password" class="forgot-password">Forgot password?</a>
-            </div>
+                <button type="submit" class="submit-button" id="loginButton">Login</button>
+            </form>
 
-            <!-- Sign up link -->
-            <div class="signup-link">
-                Don't have an account? <a href="#signup">Sign up</a>
-            </div>
-        </form>
-
-        <!-- Alternative login methods -->
-        <div class="alternative-login">
-            <p class="divider"><span>Or log in with</span></p>
-            <div class="social-buttons">
-                <button type="button" class="btn btn-social btn-google">Google</button>
-                <button type="button" class="btn btn-social btn-facebook">Facebook</button>
-            </div>
+            <p class="signup-link">Don't have an account? <a href="#">Sign up</a></p>
         </div>
-    </main>
+    </div>
 
-    <!-- Scripts -->
-    <script src="validation.js"></script>
-    <script src="auth.js"></script>
-    <script>
-    // Fallback inline script for critical functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        // Basic form validation
-        const loginForm = document.getElementById('loginForm');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const loginButton = document.getElementById('loginButton');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const buttonText = document.getElementById('buttonText');
-        const formError = document.getElementById('formError');
-        const togglePasswordButton = document.getElementById('togglePassword');
-
-        // Show/hide password
-        if (togglePasswordButton) {
-            togglePasswordButton.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                togglePasswordButton.textContent = type === 'password' ? 'Show' : 'Hide';
-            });
-        }
-
-        // Form submission handler with basic validation
-        if (loginForm) {
-            loginForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                // Reset previous errors
-                formError.classList.add('hidden');
-                formError.textContent = '';
-                document.querySelectorAll('.form-group').forEach(group => group.classList.remove('error'));
-
-                let hasErrors = false;
-
-                // Validate username
-                if (!usernameInput.value.trim()) {
-                    document.querySelector('.form-group:has(#username)').classList.add('error');
-                    hasErrors = true;
-                }
-
-                // Validate password
-                if (!passwordInput.value) {
-                    document.querySelector('.form-group:has(#password)').classList.add('error');
-                    hasErrors = true;
-                } else if (passwordInput.value.length < 8) {
-                    document.querySelector('.form-group:has(#password)').classList.add('error');
-                    document.getElementById('password-error').textContent = 'Password must be at least 8 characters long';
-                    hasErrors = true;
-                }
-
-                if (hasErrors) {
-                    return;
-                }
-
-                // Show loading state
-                loginButton.disabled = true;
-                loadingIndicator.classList.remove('hidden');
-                buttonText.textContent = 'Logging in...';
-
-                // Simulate login - in production, call your auth.js functions here
-                setTimeout(function() {
-                    try {
-                        // For testing purposes - in production, this would call your actual authentication code
-                        if (typeof performLogin === 'function') {
-                            performLogin(usernameInput.value, passwordInput.value)
-                                .then(() => {
-                                    // Success handling would happen in auth.js
-                                })
-                                .catch(error => {
-                                    formError.textContent = error.message || 'Login failed. Please try again.';
-                                    formError.classList.remove('hidden');
-                                })
-                                .finally(() => {
-                                    loginButton.disabled = false;
-                                    loadingIndicator.classList.add('hidden');
-                                    buttonText.textContent = 'Log In';
-                                });
-                        } else {
-                            // Fallback if auth.js is not loaded correctly
-                            console.log('Login attempted with:', usernameInput.value);
-
-                            // For demo only - show success
-                            formError.textContent = 'Demo mode: Auth successful (no actual authentication performed)';
-                            formError.classList.remove('hidden');
-                            formError.classList.add('alert-success');
-
-                            loginButton.disabled = false;
-                            loadingIndicator.classList.add('hidden');
-                            buttonText.textContent = 'Log In';
-                        }
-                    } catch (error) {
-                        console.error('Login error:', error);
-                        formError.textContent = 'An unexpected error occurred. Please try again.';
-                        formError.classList.remove('hidden');
-
-                        loginButton.disabled = false;
-                        loadingIndicator.classList.add('hidden');
-                        buttonText.textContent = 'Log In';
-                    }
-                }, 1000); // Simulate network request
-            });
-        }
-    });
-    </script>
+    <script src="js/validation.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>

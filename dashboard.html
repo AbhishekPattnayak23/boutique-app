@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Boutique</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 50px 20px;
+            background-color: #f5f5f5;
+        }
+        .dashboard-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .welcome-message {
+            margin-bottom: 30px;
+        }
+        .user-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .logout-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4a80ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #3a70f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Dashboard</h1>
+        <div class="welcome-message">
+            <p id="welcomeMessage">Welcome to your dashboard!</p>
+        </div>
+        <div class="user-info">
+            <h3>Your Account Information</h3>
+            <p id="userEmail">Email: </p>
+            <p id="userName">Name: </p>
+            <p id="loginTime">Login time: </p>
+        </div>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Get user data
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const loginTime = new Date(localStorage.getItem('loginTime')).toLocaleString();
+
+            // Update UI
+            document.getElementById('welcomeMessage').textContent = `Welcome, ${user.name || 'User'}!`;
+            document.getElementById('userEmail').textContent = `Email: ${user.email || 'N/A'}`;
+            document.getElementById('userName').textContent = `Name: ${user.name || 'N/A'}`;
+            document.getElementById('loginTime').textContent = `Login time: ${loginTime}`;
+
+            // Handle logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                localStorage.removeItem('loginTime');
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
