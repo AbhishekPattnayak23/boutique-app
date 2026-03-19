@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Secure System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard</h1>
+            <div id="auth-status" class="status-logged-in">Logged in</div>
+        </header>
+
+        <main>
+            <section class="protected-content">
+                <h2>Welcome to Your Dashboard</h2>
+                <p>This is a protected page that should only be visible to authenticated users.</p>
+
+                <div class="dashboard-content">
+                    <h3>Your Account</h3>
+                    <p>Username: <span id="user-name">Loading...</span></p>
+                    <p>Role: <span id="user-role">Loading...</span></p>
+                </div>
+
+                <button id="logout-button" class="btn secondary">Logout</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>Secure Authentication Demo &copy; 2023</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="feedback.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        // Dashboard specific code
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                // Redirect to login if not authenticated
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Update dashboard with user info
+            const user = window.auth.getCurrentUser();
+            if (user) {
+                document.getElementById('user-name').textContent = user.username;
+                document.getElementById('user-role').textContent = user.role;
+            }
+        });
+    </script>
+</body>
+</html>
