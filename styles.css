@@ -1,23 +1,29 @@
 /* Boutique Login Page Styles - Responsive Design */
 
 /* CSS Reset and Base Styles */
+:root {
+  --primary-color: #6a5acd;
+  --accent-color: #9370db;
+  --secondary-color: #5cb85c;
+  --error-color: #e74c3c;
+  --warning-color: #f0ad4e;
+  --success-color: #2ecc71;
+  --info-color: #5bc0de;
+  --dark-color: #333333;
+  --light-color: #f5f5f5;
+  --text-color: #333;
+  --light-text: #fff;
+  --border-color: #ddd;
+  --border-radius: 8px;
+  --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
-}
-
-:root {
-  --primary-color: #6a5acd;
-  --accent-color: #9370db;
-  --text-color: #333;
-  --light-text: #fff;
-  --error-color: #e74c3c;
-  --success-color: #2ecc71;
-  --border-radius: 8px;
-  --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
 }
 
 body {
@@ -44,6 +50,12 @@ body {
   margin: 20px auto;
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
 /* Logo and Header Styles */
 .logo {
   max-width: 120px;
@@ -58,10 +70,50 @@ h1, h2 {
   text-align: center;
 }
 
+/* Header Styles */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+}
+
+#auth-status {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.status-logged-in {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.status-logged-out {
+  background-color: var(--light-color);
+  border: 1px solid var(--border-color);
+}
+
 /* Form Styles */
 .login-form {
   display: flex;
   flex-direction: column;
+}
+
+.login-section {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -87,14 +139,27 @@ input {
   transition: var(--transition);
 }
 
-input:focus {
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+input:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus {
   border-color: var(--primary-color);
   outline: none;
   box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.2);
 }
 
-input.invalid, input.error {
-  border-color: var(--error-color);
+input.invalid, input.error, .has-error {
+  border-color: var(--error-color) !important;
   background-color: #fff5f7;
 }
 
@@ -104,6 +169,12 @@ input.invalid, input.error {
   top: 38px;
   cursor: pointer;
   color: #999;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* Button Styles */
@@ -119,12 +190,22 @@ input.invalid, input.error {
   margin-top: 10px;
 }
 
-.btn-primary, .submit-btn, .btn-login {
+.btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-primary, .submit-btn, .btn-login, .primary {
   background-color: var(--primary-color);
   color: var(--light-text);
 }
 
-.btn-primary:hover, .submit-btn:hover, .btn-login:hover {
+.btn-primary:hover, .submit-btn:hover, .btn-login:hover, .primary:hover {
   background-color: var(--accent-color);
   transform: translateY(-2px);
 }
@@ -138,6 +219,15 @@ input.invalid, input.error {
   cursor: not-allowed;
 }
 
+.secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.secondary:hover {
+  background-color: #4caa4c;
+}
+
 /* Helper Links */
 .helper-links {
   display: flex;
@@ -146,19 +236,25 @@ input.invalid, input.error {
   font-size: 14px;
 }
 
-.helper-links a {
+.helper-links a, .forgot-password {
   color: var(--primary-color);
   text-decoration: none;
   transition: var(--transition);
 }
 
-.helper-links a:hover {
+.helper-links a:hover, .forgot-password:hover {
   color: var(--accent-color);
   text-decoration: underline;
 }
 
+.forgot-password {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
 /* Error Messages */
-.error-message {
+.error-message, .validation-error {
   color: var(--error-color);
   font-size: 14px;
   margin-top: 5px;
@@ -167,6 +263,11 @@ input.invalid, input.error {
 
 .error-message.visible {
   display: block;
+}
+
+.validation-error {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
 }
 
 /* Status messages */
@@ -266,6 +367,67 @@ input.invalid, input.error {
   animation: pulse 1.5s infinite;
 }
 
+#feedback-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  z-index: 1000;
+}
+
+.feedback-message {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease-in-out;
+}
+
+.feedback-message.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.feedback-message.success {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.feedback-message.error {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.feedback-message.info {
+  background-color: var(--info-color);
+  color: white;
+}
+
+.feedback-message.warning {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.feedback-icon {
+  margin-right: 0.5rem;
+}
+
+.feedback-text {
+  flex-grow: 1;
+}
+
+.feedback-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
 /* Animation for loading */
 @keyframes pulse {
   0% { opacity: 0.6; }
@@ -273,7 +435,68 @@ input.invalid, input.error {
   100% { opacity: 0.6; }
 }
 
+/* Protected Content */
+.protected-content {
+  display: none;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+/* Login Help Section */
+.login-help {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.login-help ul {
+  list-style-type: none;
+  margin-top: 0.5rem;
+}
+
+.login-help li {
+  margin-bottom: 0.3rem;
+}
+
+/* Footer Styles */
+footer {
+  margin-top: 3rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: #777;
+  font-size: 0.9rem;
+}
+
 /* Responsive Adjustments */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  #auth-status {
+    margin-top: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .forgot-password {
+    text-align: center;
+  }
+}
+
 @media (max-width: 480px) {
   .login-container, .container {
     padding: 25px;

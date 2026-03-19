@@ -183,7 +183,7 @@ class FeedbackManager {
       console.error(`Feedback element with ID "${feedbackElementId}" not found!`);
     }
 
-    // Bind login form submission
+    // Bind login form
     this.bindLoginForm();
 
     // Initialize logging
@@ -405,6 +405,25 @@ class FeedbackManager {
   }
 }
 
+/**
+ * Escape HTML to prevent XSS
+ * @param {string} text - Text to escape
+ * @returns {string} - Escaped text
+ */
+function escapeHtml(text) {
+  if (!text) return '';
+
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
 // Initialize feedback manager when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
   try {
@@ -417,3 +436,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export the FeedbackManager class
 window.FeedbackManager = FeedbackManager;
+
+// Expose simple display feedback API for backward compatibility
+window.displayFeedback = function(type, message, duration = 5000) {
+  // Validate inputs
+  if (!type || !message) {
+    console.error('Feedback requires both type and message');
+    return;
+  }
+
+  // Validate type
+  const validTypes = ['success', 'error', 'info', 'warning'];
+  if (!validTypes.includes(type)) {
+    console.error(`Invalid feedback type: ${type}. Must be one of: ${validTypes.join(', ')}`);
+    type = 'info'; // Default to info
+  }
+
+  // Log to console for debugging
+  console.log(`FEEDBACK [${type}]: ${message}`);
+  
+  // Use the feedbackManager if available
+  if (window.feedbackManager) {
+    if (type === 'success') {
+      return window.feedbackManager.success(escapeHtml(message), duration);
+    } else if (type === 'error') {
+      return window.feedbackManager.error(escapeHtml(message), duration);
+    } else if (type === 'warning') {
+      return window.feedbackManager.warning(escapeHtml(message), duration);
+    } else {
+      return window.feedbackManager.info(escapeHtml(message), duration);
+    }
+  } else {
+    // Fallback to Feedback if available
+    if (window.Feedback) {
+      if (type === 'success') {
+        return window.Feedback.showSuccess(escapeHtml(message));
+      } else if (type === 'error') {
+        return window.Feedback.showError(escapeHtml(message));
+      } else if (type === 'warning') {
+        return window.Feedback.showWarning(escapeHtml(message));
+      } else {
+        return window.Feedback.showInfo(escapeHtml(message));
+      }
+    }
+  }
+};

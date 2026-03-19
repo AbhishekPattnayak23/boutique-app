@@ -78,10 +78,18 @@
         .feedback-container {
             margin-bottom: 1rem;
         }
+        
+        .status-logged-out {
+            color: #d32f2f;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <header>
+            <div id="auth-status" class="status-logged-out">Not logged in</div>
+        </header>
+        
         <div class="login-container">
             <div class="logo-container">
                 <img src="assets/images/logo.png" alt="Boutique Logo" class="logo">
@@ -157,7 +165,25 @@
                     <button type="button" class="btn btn-social btn-facebook">Facebook</button>
                 </div>
             </div>
+            
+            <div class="login-help">
+                <p>Demo accounts:</p>
+                <ul>
+                    <li>Email: admin@example.com, Password: admin123</li>
+                    <li>Email: user@example.com, Password: user123</li>
+                </ul>
+            </div>
         </div>
+        
+        <section class="protected-content hidden">
+            <h2>Welcome Back!</h2>
+            <p>You are now logged in to the secure area.</p>
+            <button id="logout-button" class="btn secondary">Logout</button>
+        </section>
+
+        <footer>
+            <p>Secure Authentication Demo &copy; 2023</p>
+        </footer>
     </div>
 
     <script src="js/validation.js"></script>
@@ -176,6 +202,8 @@
         const formError = document.getElementById('formError');
         const togglePasswordButton = document.getElementById('togglePassword');
         const loginSuccess = document.getElementById('loginSuccess');
+        const logoutButton = document.getElementById('logout-button');
+        const authStatus = document.getElementById('auth-status');
 
         // Show/hide password
         if (togglePasswordButton) {
@@ -183,6 +211,19 @@
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 togglePasswordButton.textContent = type === 'password' ? 'Show' : 'Hide';
+            });
+        }
+
+        // Logout button handler
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                if (typeof logout === 'function') {
+                    logout();
+                }
+                document.querySelector('.protected-content').classList.add('hidden');
+                document.querySelector('.login-container').classList.remove('hidden');
+                authStatus.textContent = 'Not logged in';
+                authStatus.className = 'status-logged-out';
             });
         }
 
@@ -238,6 +279,14 @@
                                 .then(() => {
                                     // Show success message
                                     loginSuccess.classList.add('visible');
+                                    // Update auth status
+                                    authStatus.textContent = 'Logged in as ' + emailInput.value;
+                                    authStatus.className = 'status-logged-in';
+                                    
+                                    setTimeout(() => {
+                                        document.querySelector('.login-container').classList.add('hidden');
+                                        document.querySelector('.protected-content').classList.remove('hidden');
+                                    }, 1500);
                                 })
                                 .catch(error => {
                                     formError.textContent = error.message || 'Login failed. Please try again.';
@@ -258,6 +307,10 @@
                             formError.textContent = 'Demo mode: Auth successful (no actual authentication performed)';
                             formError.classList.remove('hidden');
                             formError.classList.add('alert-success');
+                            
+                            // Update auth status
+                            authStatus.textContent = 'Logged in as ' + emailInput.value;
+                            authStatus.className = 'status-logged-in';
 
                             loginButton.disabled = false;
                             loginButton.classList.remove('btn-loading');
