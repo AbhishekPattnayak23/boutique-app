@@ -1,113 +1,205 @@
 /**
  * Form Validation Module
- * Provides comprehensive validation for login forms
+ * Provides comprehensive client-side validation for form inputs
  */
 
-// Self-invoking function to avoid polluting global namespace
-(function() {
-  // Cache DOM elements
-  const formElements = {
-    form: document.getElementById('loginForm'),
-    email: document.getElementById('email'),
-    password: document.getElementById('password'),
-    emailError: document.getElementById('emailError'),
-    passwordError: document.getElementById('passwordError')
-  };
+// Validation configuration - can be extended for more validation types
+const validationRules = {
+  required: {
+    validate: value => value.trim() !== '',
+    message: 'This field is required'
+  },
+  email: {
+    validate: value => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value),
+    message: 'Please enter a valid email address'
+  },
+  minLength: {
+    validate: (value, length) => value.length >= length,
+    message: (length) => `Must be at least ${length} characters`
+  },
+  maxLength: {
+    validate: (value, length) => value.length <= length,
+    message: (length) => `Must not exceed ${length} characters`
+  }
+};
 
-  // Validation patterns
-  const patterns = {
-    email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-    password: /^.{8,}$/ // At least 8 characters
-  };
-
-  // Validation rules
-  const validators = {
-    email: (value) => {
-      if (!value) return 'Email address is required.';
-      if (!patterns.email.test(value)) return 'Please enter a valid email address.';
-      return null;
-    },
-
-    password: (value) => {
-      if (!value) return 'Password is required.';
-      if (!patterns.password.test(value)) return 'Password must be at least 8 characters.';
-      return null;
-    }
-  };
-
-  // Initialize validation
-  function initValidation() {
-    if (!formElements.form) {
-      console.error('Login form not found on page.');
+// Validation controller
+class FormValidator {
+  constructor(formId) {
+    this.form = document.getElementById(formId);
+    if (!this.form) {
+      console.error(`Form with ID '${formId}' not found`);
       return;
     }
 
-    // Add input validation events
-    if (formElements.email) {
-      formElements.email.addEventListener('blur', function() {
-        validateField('email', this.value);
-      });
-      formElements.email.addEventListener('input', function() {
-        if (this.classList.contains('error')) {
-          validateField('email', this.value);
-        }
-      });
-    }
-
-    if (formElements.password) {
-      formElements.password.addEventListener('blur', function() {
-        validateField('password', this.value);
-      });
-      formElements.password.addEventListener('input', function() {
-        if (this.classList.contains('error')) {
-          validateField('password', this.value);
-        }
-      });
-    }
-
-    // Form submission validation
-    formElements.form.addEventListener('submit', validateForm);
+    this.formStatus = document.getElementById('formStatus');
+    this.validators = {};
+    this.setupValidation();
   }
 
-  // Validate a single field
-  function validateField(fieldName, value) {
-    const field = formElements[fieldName];
-    const errorElement = formElements[fieldName + 'Error'];
+  // Setup validation for the form
+  setupValidation() {
+    try {
+      // Prevent default form submission and handle validation
+      this.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (this.validateForm()) {
+          this.handleFormSubmission();
+        }
+      });
 
-    if (!field || !errorElement) return false;
+      // Setup field-level validation
+      this.setupEmailValidation();
+      this.setupPasswordValidation();
 
-    const error = validators[fieldName](value);
+      // Setup live validation on input change
+      this.setupLiveValidation();
 
-    if (error) {
-      field.classList.add('error');
-      errorElement.textContent = error;
-      errorElement.classList.add('visible');
-      return false;
+      console.log('Form validation initialized successfully');
+    } catch (error) {
+      console.error('Error setting up form validation:', error);
+    }
+  }
+
+  // Setup email field validation
+  setupEmailValidation() {
+    const emailInput = this.form.querySelector('#email');
+    const emailError = document.getElementById('emailError');
+
+    if (emailInput && emailError) {
+      this.validators.email = {
+        element: emailInput,
+        errorElement: emailError,
+        validate: () => {
+          const value = emailInput.value;
+          if (!validationRules.required.validate(value)) {
+            return validationRules.required.message;
+          }
+          if (!validationRules.email.validate(value)) {
+            return validationRules.email.message;
+          }
+          return null; // Validation passed
+        }
+      };
+    }
+  }
+
+  // Setup password field validation
+  setupPasswordValidation() {
+    const passwordInput = this.form.querySelector('#password');
+    const passwordError = document.getElementById('passwordError');
+
+    if (passwordInput && passwordError) {
+      this.validators.password = {
+        element: passwordInput,
+        errorElement: passwordError,
+        validate: () => {
+          const value = passwordInput.value;
+          if (!validationRules.required.validate(value)) {
+            return validationRules.required.message;
+          }
+          if (!validationRules.minLength.validate(value, 8)) {
+            return validationRules.minLength.message(8);
+          }
+          return null; // Validation passed
+        }
+      };
+    }
+  }
+
+  // Setup live validation as user types
+  setupLiveValidation() {
+    Object.values(this.validators).forEach(validator => {
+      validator.element.addEventListener('input', () => {
+        if (validator.element.classList.contains('invalid')) {
+          this.validateField(validator);
+        }
+      });
+
+      validator.element.addEventListener('blur', () => {
+        this.validateField(validator);
+      });
+    });
+  }
+
+  // Validate a specific field
+  validateField(validator) {
+    const errorMessage = validator.validate();
+    validator.errorElement.textContent = errorMessage || '';
+    validator.element.classList.toggle('invalid', !!errorMessage);
+    return !errorMessage;
+  }
+
+  // Validate the entire form
+  validateForm() {
+    let isValid = true;
+
+    Object.values(this.validators).forEach(validator => {
+      if (!this.validateField(validator)) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+
+  // Handle form submission
+  handleFormSubmission() {
+    if (this.formStatus) {
+      this.formStatus.textContent = 'Validating...';
+      this.formStatus.classList.add('status-info');
+      this.formStatus.classList.remove('status-error', 'status-success');
+    }
+
+    // This is where you would call your auth logic
+    if (typeof authenticateUser === 'function') {
+      const emailValue = this.validators.email.element.value;
+      const passwordValue = this.validators.password.element.value;
+
+      try {
+        authenticateUser(emailValue, passwordValue)
+          .then(result => {
+            this.showSubmissionResult(true, 'Login successful!');
+          })
+          .catch(error => {
+            this.showSubmissionResult(false, error.message || 'Authentication failed');
+          });
+      } catch (error) {
+        this.showSubmissionResult(false, 'An error occurred during authentication');
+        console.error('Authentication error:', error);
+      }
     } else {
-      field.classList.remove('error');
-      errorElement.classList.remove('visible');
-      return true;
+      console.log('Form is valid! Ready for submission');
+      this.showSubmissionResult(true, 'Form validated successfully (auth.js not loaded)');
     }
   }
 
-  // Validate entire form
-  function validateForm(e) {
-    const isEmailValid = validateField('email', formElements.email.value);
-    const isPasswordValid = validateField('password', formElements.password.value);
+  // Display submission result to user
+  showSubmissionResult(isSuccess, message) {
+    if (this.formStatus) {
+      this.formStatus.textContent = message;
+      this.formStatus.classList.remove('status-info');
 
-    if (!isEmailValid || !isPasswordValid) {
-      e.preventDefault();
-      return false;
+      if (isSuccess) {
+        this.formStatus.classList.add('status-success');
+        this.formStatus.classList.remove('status-error');
+      } else {
+        this.formStatus.classList.add('status-error');
+        this.formStatus.classList.remove('status-success');
+      }
     }
-
-    // Form is valid at this point - the auth.js will handle the submission
-    return true;
   }
+}
 
-  // Initialize when DOM is loaded
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initValidation);
-  } else {
-    initValidation();
+// Initialize validation when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    window.formValidator = new FormValidator('loginForm');
+  } catch (error) {
+    console.error('Failed to initialize form validation:', error);
   }
-})();
+});
+
+// Export utility functions for testing and reuse
+window.FormValidator = FormValidator;
+window.validationRules = validationRules;

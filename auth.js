@@ -63,9 +63,8 @@
     // Show loading state
     setLoadingState(true);
 
-    // Simulate API call (in production, replace with actual API call)
-    // This is a mock implementation for demo purposes
-    simulateAuthApiCall(email, password)
+    // Call authenticateUser function 
+    authenticateUser(email, password)
       .then(response => {
         setLoadingState(false);
 
@@ -84,39 +83,9 @@
       })
       .catch(error => {
         setLoadingState(false);
-        showErrorMessage('An error occurred. Please try again later.');
+        showErrorMessage(error.message || 'An error occurred. Please try again later.');
         console.error('Login error:', error);
       });
-  }
-
-  // Simulate authentication API call
-  function simulateAuthApiCall(email, password) {
-    return new Promise((resolve, reject) => {
-      console.log('Attempting login for:', email);
-
-      // Simulate API delay
-      setTimeout(() => {
-        // For demo purposes, accept any credentials
-        // In production, this would be an actual API call
-        if (email && password) {
-          resolve({
-            success: true,
-            user: { email },
-            token: 'sample-jwt-token'
-          });
-        } else {
-          resolve({
-            success: false,
-            message: 'Invalid credentials'
-          });
-        }
-      }, 1500);
-
-      // Simulate request timeout
-      setTimeout(() => {
-        reject(new Error('Request timed out'));
-      }, config.requestTimeout);
-    });
   }
 
   // Helper: Set loading state
@@ -156,3 +125,41 @@
     initAuth();
   }
 })();
+
+/**
+ * Simulate authentication with a Promise
+ */
+function authenticateUser(email, password) {
+  return new Promise((resolve, reject) => {
+    console.log(`Authentication attempt for email: ${email}`);
+
+    // Simulate network delay
+    setTimeout(() => {
+      try {
+        // Demo validation - in production this would call an API
+        if (!email || !password) {
+          return reject(new Error('Email and password are required'));
+        }
+
+        // For demo purposes only - NEVER use this in production
+        // This is just to demonstrate the validation flow
+        if (email === 'test@example.com' && password === 'password123') {
+          console.log('Authentication successful');
+          return resolve({
+            success: true,
+            user: { email, id: 'user-123' }
+          });
+        }
+
+        console.log('Authentication failed - invalid credentials');
+        reject(new Error('Invalid email or password'));
+      } catch (error) {
+        console.error('Authentication error:', error);
+        reject(new Error('Authentication failed'));
+      }
+    }, 1000); // Simulate network delay
+  });
+}
+
+// Export the authentication function
+window.authenticateUser = authenticateUser;
