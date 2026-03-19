@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Shop - Dashboard</title>
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        .welcome-message {
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background-color: #f9f4ff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .logout-btn {
+            display: inline-block;
+            background-color: #7c4dff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            background-color: #6a3de8;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="login-header">
+            <img src="assets/logo.png" alt="Boutique Logo" class="logo">
+            <h1>Dashboard</h1>
+        </div>
+
+        <div class="welcome-message">
+            <h2>Welcome to your Boutique Dashboard</h2>
+            <p>You have successfully logged in!</p>
+            <a href="index.html" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            if (!isAuthenticated) {
+                // Redirect to login page if not authenticated
+                window.location.href = 'index.html';
+            }
+
+            // Handle logout
+            document.querySelector('.logout-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('username');
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>

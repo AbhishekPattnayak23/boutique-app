@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Authentication System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <a href="/">Authentication System</a>
+                </div>
+                <div class="navbar-menu">
+                    {% if session.get('user_id') %}
+                        <span class="navbar-item">Welcome, {{ session.get('username') }}</span>
+                        <a href="{{ url_for('auth.logout') }}" class="navbar-item">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="navbar-item">Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="navbar-item">Register</a>
+                    {% endif %}
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Authentication System</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth-validation.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
