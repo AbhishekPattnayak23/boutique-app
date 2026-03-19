@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .test-container {
+            margin-bottom: 30px;
+        }
+        .test-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+        .test-results {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test-pass {
+            color: green;
+        }
+        .test-fail {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Form Validation Tests</h1>
+
+    <div class="test-container">
+        <h2>Testing Login Form Validation</h2>
+
+        <div class="test-form">
+            <div id="errorMessage" class="error-message"></div>
+
+            <form id="loginForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+
+                <button type="submit" id="submitBtn">Sign In</button>
+            </form>
+        </div>
+
+        <div class="test-results">
+            <h3>Test Results</h3>
+            <div id="testOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('errorMessage');
+            const testOutput = document.getElementById('testOutput');
+
+            // Add form validation
+            loginForm.addEventListener('submit', function(event) {
+                // Reset error state
+                resetErrors();
+
+                // Validate email
+                if (!validateEmail(emailInput.value)) {
+                    showError('Please enter a valid email address');
+                    return false;
+                }
+
+                // Validate password
+                if (passwordInput.value.length < 8) {
+                    showError('Password must be at least 8 characters long');
+                    return false;
+                }
+
+                // Show success
+                showTestResult('Form validation passed!', true);
+                return false;
+            });
+
+            // Test buttons
+            document.body.insertAdjacentHTML('beforeend', `
+                <div class="test-container">
+                    <h2>Run Test Cases</h2>
+                    <button id="testValidEmails">Test Valid Emails</button>
+                    <button id="testInvalidEmails">Test Invalid Emails</button>
+                    <button id="testValidPasswords">Test Valid Passwords</button>
+                    <button id="testInvalidPasswords">Test Invalid Passwords</button>
+                </div>
+            `);
+
+            // Set up test cases
+            document.getElementById('testValidEmails').addEventListener('click', function() {
+                const validEmails = ['test@example.com', 'user.name@domain.com', 'user-name@domain.co.uk'];
+                testOutput.innerHTML = '';
+
+                validEmails.forEach(email => {
+                    emailInput.value = email;
+                    const isValid = validateEmail(email);
+                    showTestResult(`Email "${email}" validation: ${isValid ? 'PASS' : 'FAIL'}`, isValid);
+                });
+            });
+
+            document.getElementById('testInvalidEmails').addEventListener('click', function() {
+                const invalidEmails = ['test', 'test@', '@example.com', 'test@example', 'test@@example.com'];
+                testOutput.innerHTML = '';
+
+                invalidEmails.forEach(email => {
+                    emailInput.value = email;
+                    const isValid = validateEmail(email);
+                    showTestResult(`Email "${email}" rejection: ${!isValid ? 'PASS' : 'FAIL'}`, !isValid);
+                });
+            });
+
+            document.getElementById('testValidPasswords').addEventListener('click', function() {
+                const validPasswords = ['password123', 'P@ssw0rd!', '12345678'];
+                testOutput.innerHTML = '';
+
+                validPasswords.forEach(password => {
+                    passwordInput.value = password;
+                    const isValid = password.length >= 8;
+                    showTestResult(`Password with length ${password.length} validation: ${isValid ? 'PASS' : 'FAIL'}`, isValid);
+                });
+            });
+
+            document.getElementById('testInvalidPasswords').addEventListener('click', function() {
+                const invalidPasswords = ['1234', 'pass', '123'];
+                testOutput.innerHTML = '';
+
+                invalidPasswords.forEach(password => {
+                    passwordInput.value = password;
+                    const isValid = password.length >= 8;
+                    showTestResult(`Password with length ${password.length} rejection: ${!isValid ? 'PASS' : 'FAIL'}`, !isValid);
+                });
+            });
+
+            // Utility functions
+            function validateEmail(email) {
+                const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                return re.test(email);
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                showTestResult(message, false);
+            }
+
+            function resetErrors() {
+                errorMessage.textContent = '';
+                errorMessage.style.display = 'none';
+            }
+
+            function showTestResult(message, passed) {
+                const resultElement = document.createElement('div');
+                resultElement.className = passed ? 'test-pass' : 'test-fail';
+                resultElement.textContent = message;
+                testOutput.appendChild(resultElement);
+            }
+        });
+    </script>
+</body>
+</html>

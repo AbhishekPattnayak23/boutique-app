@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Test</title>
+    <link rel="stylesheet" href="../public/css/login.css">
+    <link rel="stylesheet" href="../public/css/responsive.css">
+    <link rel="stylesheet" href="../public/css/utils.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .breakpoint-indicator {
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .test-result {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="breakpoint-indicator">
+        Current width: <span id="screenWidth"></span>px
+    </div>
+
+    <h1>Responsive Design Test</h1>
+    <p>Resize the window to see how the layout responds to different viewport sizes.</p>
+
+    <div class="test-container">
+        <h2>Testing Mobile View (< 576px)</h2>
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Mobile Test</h1>
+                </div>
+                <form class="login-form">
+                    <div class="form-group">
+                        <label>Test Input</label>
+                        <input type="text" placeholder="Test input">
+                    </div>
+                    <button type="button">Test Button</button>
+                </form>
+            </div>
+        </div>
+        <div id="mobileTest" class="test-result"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Testing Tablet View (576px - 991px)</h2>
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Tablet Test</h1>
+                </div>
+                <form class="login-form">
+                    <div class="form-group">
+                        <label>Test Input</label>
+                        <input type="text" placeholder="Test input">
+                    </div>
+                    <button type="button">Test Button</button>
+                </form>
+            </div>
+        </div>
+        <div id="tabletTest" class="test-result"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Testing Desktop View ( 992px)</h2>
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Desktop Test</h1>
+                </div>
+                <form class="login-form">
+                    <div class="form-group">
+                        <label>Test Input</label>
+                        <input type="text" placeholder="Test input">
+                    </div>
+                    <button type="button">Test Button</button>
+                </form>
+            </div>
+        </div>
+        <div id="desktopTest" class="test-result"></div>
+    </div>
+
+    <script>
+        // Update screen width indicator
+        function updateScreenWidth() {
+            document.getElementById('screenWidth').textContent = window.innerWidth;
+
+            // Test mobile
+            const mobileTest = document.getElementById('mobileTest');
+            if (window.innerWidth < 576) {
+                mobileTest.textContent = 'PASS: Viewing at mobile width';
+                mobileTest.className = 'test-result test-pass';
+            } else {
+                mobileTest.textContent = 'FAIL: Not at mobile width';
+                mobileTest.className = 'test-result test-fail';
+            }
+
+            // Test tablet
+            const tabletTest = document.getElementById('tabletTest');
+            if (window.innerWidth >= 576 && window.innerWidth < 992) {
+                tabletTest.textContent = 'PASS: Viewing at tablet width';
+                tabletTest.className = 'test-result test-pass';
+            } else {
+                tabletTest.textContent = 'FAIL: Not at tablet width';
+                tabletTest.className = 'test-result test-fail';
+            }
+
+            // Test desktop
+            const desktopTest = document.getElementById('desktopTest');
+            if (window.innerWidth >= 992) {
+                desktopTest.textContent = 'PASS: Viewing at desktop width';
+                desktopTest.className = 'test-result test-pass';
+            } else {
+                desktopTest.textContent = 'FAIL: Not at desktop width';
+                desktopTest.className = 'test-result test-fail';
+            }
+        }
+
+        window.addEventListener('resize', updateScreenWidth);
+        document.addEventListener('DOMContentLoaded', updateScreenWidth);
+    </script>
+</body>
+</html>
